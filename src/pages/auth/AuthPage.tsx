@@ -32,7 +32,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div style={{
+    <div className="cinematic-auth" style={{
       minHeight: '100dvh',
       display: 'flex',
       flexDirection: 'column',
@@ -41,7 +41,7 @@ export default function AuthPage() {
       padding: '40px 20px',
       background: 'radial-gradient(circle at 15% 15%, rgba(126,214,192,.14), transparent 34%), radial-gradient(circle at 85% 85%, rgba(245,199,122,.12), transparent 30%), var(--background)',
     }}>
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+      <div className="cinematic-auth-brand" style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{
           width: 72,
           height: 72,
@@ -56,13 +56,13 @@ export default function AuthPage() {
         }}>
           ✦
         </div>
-        <h1 style={{ fontSize: '2rem', color: 'var(--foreground)', letterSpacing: '-0.06em', marginBottom: 6 }}>restart</h1>
+        <h1 style={{ fontSize: '2rem', color: 'var(--foreground)', letterSpacing: '-0.06em', marginBottom: 6 }}>restart°</h1>
         <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9375rem' }}>
           a fresh start for your attention
         </p>
       </div>
 
-      <div className="card-elevated" style={{ width: '100%', maxWidth: 420, boxShadow: 'var(--shadow-md)', background: 'color-mix(in srgb, var(--card) 90%, transparent)' }}>
+      <div className="card-elevated cinematic-auth-card" style={{ width: '100%', maxWidth: 420, boxShadow: 'var(--shadow-md)', background: 'color-mix(in srgb, var(--card) 90%, transparent)' }}>
         <form onSubmit={handleEnter} className="gap-stack">
           <div>
             <label className="label" htmlFor="display-name">What should we call you?</label>

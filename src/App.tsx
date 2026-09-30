@@ -22,7 +22,7 @@ function Protected({ children }: { children: React.ReactNode }) {
 // App shell wrapping main pages
 function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="app-shell">
+    <div className="app-shell cinematic-shell">
       <main className="page-content">
         {children}
       </main>
