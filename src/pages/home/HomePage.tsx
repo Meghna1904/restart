@@ -164,14 +164,14 @@ export default function HomePage() {
   const counts = countsData?.counts ?? {}
 
   return (
-    <div className="animate-fade-in" style={{ paddingTop: 40, paddingBottom: 64 }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20, marginBottom: 20 }}>
+    <div className="animate-fade-in restart-home" style={{ paddingTop: 40, paddingBottom: 64 }}>
+      <header className="restart-home-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20, marginBottom: 20 }}>
         <div>
-          <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>{day} · {date}</p>
+          <span className="restart-kicker">{day} · {date}</span>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', letterSpacing: '-0.05em', lineHeight: 1.05 }}>Make room<br />for your life.</h1>
         </div>
-        <div className="tag-pill" style={{ flexShrink: 0, background: 'rgba(126, 214, 192, 0.12)', borderColor: 'rgba(126, 214, 192, 0.2)' }}>
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--primary)' }} /> grounded
+        <div className="restart-orbit" aria-hidden="true">
+          <span />
         </div>
       </header>
 
