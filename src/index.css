@@ -338,6 +338,51 @@ h1, h2, h3, h4, h5, h6 {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.restart-space-header { padding: 54px 0 34px; }
+.restart-space-header h1 { margin-top: 22px; }
+.restart-space-header p { max-width: 430px; margin-top: 18px; color: var(--muted-foreground); }
+.restart-space-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  font: .68rem 'Space Mono', monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.restart-space-feature { padding: 28px; }
+.restart-space-feature h2,
+.restart-space-panel h2 { margin-bottom: 8px; }
+.restart-space-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.restart-space-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--foreground);
+}
+.restart-space-action span { flex: 1; color: var(--muted-foreground); font-size: .82rem; }
+.restart-space-panel { padding: 24px; }
+.restart-space-panel > p { color: var(--muted-foreground); font-size: .8rem; line-height: 1.6; margin-bottom: 18px; }
+.restart-space-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.restart-space-fields { display: grid; gap: 8px; margin-bottom: 12px; }
+.restart-space-fields .input { min-height: 54px; resize: vertical; }
+.restart-space-reflection { min-height: 150px; resize: vertical; margin-bottom: 10px; }
+.restart-space-hint { display: block; color: var(--muted-foreground); font-size: .68rem; margin-bottom: 14px; }
+.restart-space-scroll-fields { display: grid; grid-template-columns: 1fr .7fr; gap: 8px; margin-bottom: 10px; }
+.restart-space-panel > .btn { margin-top: 14px; }
+@media (max-width: 680px) {
+  .restart-space-header { padding-top: 38px; }
+  .restart-space-feature, .restart-space-panel { padding: 20px; }
+  .restart-space-grid { grid-template-columns: 1fr; }
+  .restart-space-action { align-items: flex-start; flex-wrap: wrap; }
+  .restart-space-action span { min-width: calc(100% - 40px); }
+  .restart-space-action .btn { width: 100%; }
+}
 
 .page-content > .animate-fade-in > header h1 {
   font-family: var(--font-heading);

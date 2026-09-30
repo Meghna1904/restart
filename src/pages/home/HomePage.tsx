@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useBrainCounts, useAddBrainItem, useUpdateBrainCategory } from '../../hooks/useBrainDump'
 import { useShouldShowNudge, getCurrentNudgeType, getNudgeMessage, useLogNudgeResponse, NUDGES } from '../../hooks/useNudges'
@@ -57,6 +58,7 @@ const PRIORITIES: Priority[] = [
 ]
 
 export default function HomePage() {
+  const navigate = useNavigate()
   const { profile, user } = useAuth()
   const { data: countsData, error: countsError } = useBrainCounts()
   const addBrainItem = useAddBrainItem()
@@ -90,7 +92,7 @@ export default function HomePage() {
   const [dumpSortOpen, setDumpSortOpen] = useState(false)
   const [beforeAiOpen, setBeforeAiOpen] = useState(false)
   const [beforeAi, setBeforeAi] = useState({ understand: '', tried: '', example: '', stuck: '' })
-  const [showMore, setShowMore] = useState(false)
+  const showMore = false
 
   const [capturedItemId, setCapturedItemId] = useState<string | null>(null)
   const todayKey = `restart-today-${user?.id ?? 'guest'}-${todayLocal()}`
@@ -308,9 +310,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <button className="home-more-toggle" type="button" onClick={() => setShowMore(value => !value)} aria-expanded={showMore}>
-        <span>{showMore ? 'show less' : 'more ways to restart'}</span>
-        <span aria-hidden="true">{showMore ? '↑' : '↓'}</span>
+      <button className="home-more-toggle" type="button" onClick={() => navigate('/restart')}>
+        <span>open your restart space</span>
+        <span aria-hidden="true">↗</span>
       </button>
 
       <section className={`home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 26 }}>

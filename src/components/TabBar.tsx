@@ -8,6 +8,7 @@ const TABS = [
   { to: '/vault',  label: 'Vault',   icon: 'lucide:archive' },
   { to: '/me',     label: 'Me',      icon: 'lucide:user' },
   { to: '/insights', label: 'Patterns', icon: 'lucide:sparkles' },
+  { to: '/restart', label: 'Restart', icon: 'lucide:rotate-ccw' },
 ]
 
 export default function TabBar() {
