@@ -17,6 +17,22 @@ function todayLabel() {
 
 type PriorityId = 'move' | 'study'
 type Priority = { id: PriorityId; label: string; icon: string; color: string; steps: string[] }
+type Energy = 'low' | 'middle' | 'ready'
+type MinimumActivity = 'study' | 'move' | 'read' | 'podcast' | 'journal'
+
+const MINIMUM_VERSIONS: Record<MinimumActivity, { label: string; icon: string; action: string; color: string }> = {
+  study: { label: 'Study', icon: 'lucide:book-open', action: 'open the problem and write one example', color: '#f5c77a' },
+  move: { label: 'Exercise', icon: 'lucide:footprints', action: 'put on workout clothes', color: '#7ed6c0' },
+  read: { label: 'Reading', icon: 'lucide:book-marked', action: 'read one page', color: '#c9a7eb' },
+  podcast: { label: 'Podcast', icon: 'lucide:headphones', action: 'listen for five minutes', color: '#f49f8c' },
+  journal: { label: 'Journaling', icon: 'lucide:pen-line', action: 'write one honest sentence', color: '#94d2bd' },
+}
+
+const ENERGY_COPY: Record<Energy, { label: string; description: string }> = {
+  low: { label: 'barely here', description: 'Choose something kind and almost too easy.' },
+  middle: { label: 'somewhat available', description: 'There is a little room for one honest step.' },
+  ready: { label: 'ready enough', description: 'You can sit with a little more friction today.' },
+}
 
 const PRIORITIES: Priority[] = [
   {
@@ -59,9 +75,18 @@ export default function HomePage() {
   const [scrollApp, setScrollApp] = useState('Instagram')
   const [scrollMinutes, setScrollMinutes] = useState('')
   const [scrollReason, setScrollReason] = useState('')
+  const [energy, setEnergy] = useState<Energy | null>(null)
+  const [minimumActivity, setMinimumActivity] = useState<MinimumActivity>('study')
+  const [minimumDone, setMinimumDone] = useState(false)
+  const [frictionOpen, setFrictionOpen] = useState(false)
+  const [friction, setFriction] = useState('')
+  const [dumpSortOpen, setDumpSortOpen] = useState(false)
+  const [beforeAiOpen, setBeforeAiOpen] = useState(false)
+  const [beforeAi, setBeforeAi] = useState({ understand: '', tried: '', example: '', stuck: '' })
 
   const todayKey = `restart-today-${user?.id ?? 'guest'}-${new Date().toISOString().slice(0, 10)}`
   const noteKey = `${todayKey}-note`
+  const scratchpadKey = `${todayKey}-before-ai`
 
   useEffect(() => {
     const saved = localStorage.getItem(todayKey)
@@ -73,7 +98,17 @@ export default function HomePage() {
       }
     }
     setReflection(localStorage.getItem(noteKey) ?? '')
-  }, [noteKey, todayKey])
+    setFriction(localStorage.getItem(`${todayKey}-friction`) ?? '')
+    setMinimumDone(!!localStorage.getItem(`${todayKey}-minimum`))
+    const savedScratchpad = localStorage.getItem(scratchpadKey)
+    if (savedScratchpad) {
+      try {
+        setBeforeAi(JSON.parse(savedScratchpad) as typeof beforeAi)
+      } catch {
+        localStorage.removeItem(scratchpadKey)
+      }
+    }
+  }, [noteKey, scratchpadKey, todayKey])
 
   const updatePriority = (id: PriorityId) => {
     setPriorityState(current => {
@@ -85,6 +120,25 @@ export default function HomePage() {
       toast(`${id === 'move' ? 'movement' : 'study'} started — that is enough for a beginning`, 'success')
       return next
     })
+  }
+
+  const markMinimumDone = () => {
+    setMinimumDone(true)
+    toast('That small return counts.', 'success')
+    localStorage.setItem(`${todayKey}-minimum`, minimumActivity)
+  }
+
+  const saveFriction = (value: string) => {
+    setFriction(value)
+    localStorage.setItem(`${todayKey}-friction`, value)
+    setFrictionOpen(false)
+    toast('Noted without turning it into a verdict.', 'success')
+  }
+
+  const saveBeforeAi = () => {
+    localStorage.setItem(scratchpadKey, JSON.stringify(beforeAi))
+    setBeforeAiOpen(false)
+    toast('Your thinking is saved for this visit.', 'success')
   }
 
   const chooseAnotherStep = (id: PriorityId) => {
@@ -103,6 +157,7 @@ export default function HomePage() {
     if (!dumpText.trim()) return
     await addBrainItem.mutateAsync({ content: dumpText, source: 'quick' })
     setDumpText('')
+    setDumpSortOpen(true)
   }
 
   const { day, date } = todayLabel()
@@ -123,6 +178,64 @@ export default function HomePage() {
       <p style={{ fontSize: '1.05rem', color: 'var(--muted-foreground)', marginBottom: 22 }}>
         {greeting(profile?.display_name ?? user?.user_metadata?.display_name)} You do not have to fix everything today.
       </p>
+
+      <section className="card" style={{ marginBottom: 20, padding: 20, background: 'linear-gradient(145deg, rgba(201,167,235,.11), var(--card))' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start' }}>
+          <div>
+            <p style={{ color: '#c9a7eb', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>Check in, don’t optimise</p>
+            <h2 style={{ fontSize: '1.25rem', letterSpacing: '-0.03em' }}>How available are you?</h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginTop: 5 }}>
+              {energy ? ENERGY_COPY[energy].description : 'This changes the size of the suggestion, not your worth.'}
+            </p>
+          </div>
+          <span style={{ fontSize: '1.35rem' }} aria-hidden="true">◌</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 15 }}>
+          {(['low', 'middle', 'ready'] as Energy[]).map(level => (
+            <button key={level} type="button" className={`btn ${energy === level ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 42, padding: '8px 6px', fontSize: '0.78rem' }} onClick={() => setEnergy(level)}>
+              {ENERGY_COPY[level].label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="card" style={{ marginBottom: 24, padding: 20, borderColor: 'rgba(126,214,192,.25)', background: 'linear-gradient(145deg, rgba(126,214,192,.1), var(--card))' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+          <Icon icon="lucide:rotate-ccw" width={18} style={{ color: 'var(--primary)' }} />
+          <p style={{ color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Return, don’t restart</p>
+        </div>
+        <h2 style={{ fontSize: '1.25rem', letterSpacing: '-0.03em' }}>Continue where you left off</h2>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: '0.88rem', margin: '6px 0 14px' }}>
+          {beforeAi.understand ? 'Your DSA scratchpad is waiting for one more thought.' : 'Nothing needs to be perfectly set up before you begin.'}
+        </p>
+        <button className="btn btn-secondary" onClick={() => setBeforeAiOpen(true)}>
+          {beforeAi.understand ? 'open my scratchpad' : 'choose a place to return'}
+        </button>
+        {friction && <p style={{ color: 'var(--muted-foreground)', fontSize: '0.76rem', marginTop: 10 }}>Last time, starting felt: {friction}.</p>}
+      </section>
+
+      <section className="card" style={{ marginBottom: 24, padding: 20, background: 'linear-gradient(145deg, rgba(245,199,122,.08), var(--card))' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, alignItems: 'start' }}>
+          <div>
+            <p style={{ color: 'var(--accent)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>The Restart button</p>
+            <h2 style={{ fontSize: '1.25rem', letterSpacing: '-0.03em' }}>Choose the minimum version</h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginTop: 5 }}>Small enough to begin. Real enough to count.</p>
+          </div>
+          <span style={{ fontSize: '1.35rem' }} aria-hidden="true">✦</span>
+        </div>
+        <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginTop: 15 }}>
+          {(Object.keys(MINIMUM_VERSIONS) as MinimumActivity[]).map(activity => (
+            <button key={activity} type="button" className={`tag-pill ${minimumActivity === activity ? 'selected-chip' : ''}`} onClick={() => { setMinimumActivity(activity); setMinimumDone(false) }}>
+              {MINIMUM_VERSIONS[activity].label}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16, padding: 12, borderRadius: 14, background: 'color-mix(in srgb, var(--background) 65%, transparent)' }}>
+          <Icon icon={MINIMUM_VERSIONS[minimumActivity].icon} width={21} style={{ color: MINIMUM_VERSIONS[minimumActivity].color, flexShrink: 0 }} />
+          <p style={{ flex: 1, fontSize: '0.9rem' }}>{MINIMUM_VERSIONS[minimumActivity].action}</p>
+          <button className="btn btn-primary btn-sm" onClick={markMinimumDone} disabled={minimumDone}>{minimumDone ? 'started ✓' : 'I’ll do this'}</button>
+        </div>
+      </section>
 
       <section className="card" style={{ marginBottom: 24, padding: 24, background: 'linear-gradient(145deg, rgba(126,214,192,.12), var(--card))' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 16, marginBottom: 18 }}>
@@ -150,10 +263,11 @@ export default function HomePage() {
                 </p>
                 {!current.done && (
                   <div style={{ display: 'flex', gap: 7, marginTop: 14 }}>
-                    <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => updatePriority(priority.id)}>I started</button>
+                    <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => updatePriority(priority.id)}>minimum version</button>
                     <button className="btn btn-ghost btn-sm" aria-label={`Choose another ${priority.label.toLowerCase()} step`} onClick={() => chooseAnotherStep(priority.id)}>↻</button>
                   </div>
                 )}
+                {!current.done && <button className="btn btn-ghost btn-sm" style={{ marginTop: 8, width: '100%' }} onClick={() => setFrictionOpen(true)}>not today — why is starting hard?</button>}
               </div>
             )
           })}
@@ -239,6 +353,16 @@ export default function HomePage() {
         >
           {addBrainItem.isPending ? 'Saving...' : '+ brain dump'}
         </button>
+        {dumpSortOpen && (
+          <div style={{ marginTop: 14, padding: 14, borderRadius: 14, background: 'color-mix(in srgb, var(--primary) 9%, transparent)' }}>
+            <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: 9 }}>Captured. What should this become?</p>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {['keep as a thought', 'tiny action', 'question to revisit', 'let it rest'].map(choice => (
+                <button key={choice} type="button" className="btn btn-ghost btn-sm" onClick={() => { setDumpSortOpen(false); toast(choice === 'let it rest' ? 'It can rest here.' : `Saved as ${choice}.`, 'success') }}>{choice}</button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Gentle Nudge */}
@@ -276,6 +400,50 @@ export default function HomePage() {
         <h2 className="section-title">Your space</h2>
         <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>a little at a time</span>
       </div>
+
+      {frictionOpen && (
+        <div className="modal-overlay" role="presentation" onClick={() => setFrictionOpen(false)}>
+          <section className="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="friction-title" onClick={event => event.stopPropagation()}>
+            <div className="sheet-handle" />
+            <p className="section-title" style={{ color: 'var(--primary)', marginBottom: 8 }}>No blame, just information</p>
+            <h2 id="friction-title" style={{ fontSize: '1.55rem', letterSpacing: '-0.04em' }}>What made starting hard?</h2>
+            <p style={{ color: 'var(--muted-foreground)', margin: '8px 0 20px', fontSize: '0.9rem' }}>This is a clue for next time, not a reason to judge today.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {['too tired', 'too unclear', 'too large', 'distracted', 'avoiding discomfort', 'not interested today'].map(option => (
+                <button key={option} className={`btn ${friction === option ? 'btn-primary' : 'btn-ghost'}`} onClick={() => saveFriction(option)}>{option}</button>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {beforeAiOpen && (
+        <div className="modal-overlay" role="presentation" onClick={() => setBeforeAiOpen(false)}>
+          <section className="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="scratchpad-title" onClick={event => event.stopPropagation()}>
+            <div className="sheet-handle" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 16 }}>
+              <div>
+                <p className="section-title" style={{ color: 'var(--accent)', marginBottom: 8 }}>Before AI</p>
+                <h2 id="scratchpad-title" style={{ fontSize: '1.55rem', letterSpacing: '-0.04em' }}>Give your own brain a minute.</h2>
+              </div>
+              <button className="btn btn-ghost btn-sm" aria-label="Close scratchpad" onClick={() => setBeforeAiOpen(false)}>✕</button>
+            </div>
+            <p style={{ color: 'var(--muted-foreground)', margin: '8px 0 18px', fontSize: '0.9rem' }}>Write anything you know before looking for an explanation. Rough is the point.</p>
+            <div className="gap-stack">
+              {([
+                ['understand', 'What do I understand so far?'],
+                ['tried', 'What have I tried?'],
+                ['example', 'What is one example?'],
+                ['stuck', 'What exactly is confusing?'],
+              ] as const).map(([key, placeholder]) => (
+                <textarea key={key} className="input" placeholder={placeholder} value={beforeAi[key]} onChange={event => setBeforeAi(current => ({ ...current, [key]: event.target.value }))} style={{ minHeight: 58, resize: 'vertical' }} />
+              ))}
+            </div>
+            <button className="btn btn-primary btn-full" style={{ marginTop: 14 }} onClick={saveBeforeAi}>save my thinking</button>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem', textAlign: 'center', marginTop: 9 }}>When you’re ready, open help without losing your own attempt.</p>
+          </section>
+        </div>
+      )}
 
       {countsError && (
         <div className="card" role="alert" style={{ marginBottom: 14, borderColor: 'var(--destructive)', color: 'var(--destructive)', fontSize: '0.85rem' }}>
