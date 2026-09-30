@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { useBrainItems, useAddBrainItem } from '../../hooks/useBrainDump'
 
 export default function IdeasPage() {
-  const { data: ideas, isLoading } = useBrainItems('ideas')
+  const { data: ideas, isLoading, error } = useBrainItems('ideas')
   const addIdea = useAddBrainItem()
   const [newIdea, setNewIdea] = useState('')
 
@@ -58,6 +58,11 @@ export default function IdeasPage() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {error && (
+          <div className="card" role="alert" style={{ borderColor: 'var(--destructive)', color: 'var(--destructive)' }}>
+            Ideas could not load. Run the latest Supabase migrations, then refresh.
+          </div>
+        )}
         {ideas?.length === 0 ? (
           <p style={{ color: 'var(--muted-foreground)', textAlign: 'center', marginTop: 40 }}>No ideas yet.</p>
         ) : (

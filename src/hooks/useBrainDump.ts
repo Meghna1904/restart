@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../contexts/ToastContext'
 import { autoCategorize } from '../lib/utils'
 import type { BrainCategory } from '../lib/database.types'
 
@@ -67,6 +68,7 @@ export function useBrainCounts() {
 /** Add a brain item — auto-categorizes if no category given */
 export function useAddBrainItem() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const qc = useQueryClient()
 
   return useMutation({
@@ -97,12 +99,16 @@ export function useAddBrainItem() {
       qc.invalidateQueries({ queryKey: ['brain_items', user?.id] })
       qc.invalidateQueries({ queryKey: ['brain_counts', user?.id] })
     },
+    onError: (error) => {
+      toast(`Couldn't save that yet: ${error.message}`, 'error')
+    },
   })
 }
 
 /** Archive (soft-delete) a brain item */
 export function useArchiveBrainItem() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const qc = useQueryClient()
 
   return useMutation({
@@ -118,12 +124,16 @@ export function useArchiveBrainItem() {
       qc.invalidateQueries({ queryKey: ['brain_items', user?.id] })
       qc.invalidateQueries({ queryKey: ['brain_counts', user?.id] })
     },
+    onError: (error) => {
+      toast(`Couldn't archive that: ${error.message}`, 'error')
+    },
   })
 }
 
 /** Update category of a brain item */
 export function useUpdateBrainCategory() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const qc = useQueryClient()
 
   return useMutation({
@@ -138,6 +148,9 @@ export function useUpdateBrainCategory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['brain_items', user?.id] })
       qc.invalidateQueries({ queryKey: ['brain_counts', user?.id] })
+    },
+    onError: (error) => {
+      toast(`Couldn't update the category: ${error.message}`, 'error')
     },
   })
 }

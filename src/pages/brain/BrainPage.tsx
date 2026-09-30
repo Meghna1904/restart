@@ -3,7 +3,7 @@ import { useBrainItems, useUpdateBrainCategory, CATEGORY_META } from '../../hook
 import type { BrainCategory } from '../../lib/database.types'
 
 export default function BrainPage() {
-  const { data: items, isLoading } = useBrainItems()
+  const { data: items, isLoading, error } = useBrainItems()
   const updateCategory = useUpdateBrainCategory()
   const [filter, setFilter] = useState<BrainCategory | 'all'>('all')
 
@@ -51,6 +51,11 @@ export default function BrainPage() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {error && (
+          <div className="card" role="alert" style={{ borderColor: 'var(--destructive)', color: 'var(--destructive)' }}>
+            Brain items could not load. Run the latest Supabase migrations, then refresh.
+          </div>
+        )}
         {filtered.length === 0 ? (
           <p style={{ color: 'var(--muted-foreground)', textAlign: 'center', marginTop: 40 }}>Nothing here yet.</p>
         ) : (

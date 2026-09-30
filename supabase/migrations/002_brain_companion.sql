@@ -13,6 +13,7 @@ create table if not exists profiles (
 );
 
 alter table profiles enable row level security;
+drop policy if exists "own profile only" on profiles;
 create policy "own profile only" on profiles for all
   using (auth.uid() = id) with check (auth.uid() = id);
 

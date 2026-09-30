@@ -24,12 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
     if (data) setProfile(data)
+    if (error) console.warn('Profile is not available yet:', error.message)
   }
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        void fetchProfile(session.user.id)
         void syncOfflineQueue()
       }
       setLoading(false)
@@ -47,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        void fetchProfile(session.user.id)
         void syncOfflineQueue()
       } else {
         setProfile(null)

@@ -14,8 +14,8 @@ function todayLabel() {
 }
 
 export default function HomePage() {
-  const { profile } = useAuth()
-  const { data: countsData } = useBrainCounts()
+  const { profile, user } = useAuth()
+  const { data: countsData, error: countsError } = useBrainCounts()
   const addBrainItem = useAddBrainItem()
   
   const showNudge = useShouldShowNudge()
@@ -50,7 +50,7 @@ export default function HomePage() {
       </header>
 
       <p style={{ fontSize: '1.05rem', color: 'var(--muted-foreground)', marginBottom: 28 }}>
-        {greeting(profile?.display_name)} Take a breath, then choose one small next step.
+        {greeting(profile?.display_name ?? user?.user_metadata?.display_name)} Take a breath, then choose one small next step.
       </p>
 
       {/* Brain Dump Input */}
@@ -113,6 +113,12 @@ export default function HomePage() {
         <h2 className="section-title">Your space</h2>
         <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>a little at a time</span>
       </div>
+
+      {countsError && (
+        <div className="card" role="alert" style={{ marginBottom: 14, borderColor: 'var(--destructive)', color: 'var(--destructive)', fontSize: '0.85rem' }}>
+          Your space is connected, but the brain table is not ready yet. Run the latest Supabase migrations, then refresh.
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
         <BucketRow icon="💡" count={counts.ideas ?? 0} label="ideas" color="#ee9b00" />

@@ -14,10 +14,16 @@ export default function AuthPage() {
 
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signInAnonymously({
+      const { data, error } = await supabase.auth.signInAnonymously({
         options: { data: { display_name: name } },
       })
       if (error) throw error
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({ id: data.user.id, display_name: name }, { onConflict: 'id' })
+        if (profileError) throw profileError
+      }
     } catch (error) {
       toast((error as Error).message, 'error')
     } finally {
