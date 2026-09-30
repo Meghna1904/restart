@@ -1,0 +1,110 @@
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
+
+export type BrainCategory = 'ideas' | 'learn' | 'social' | 'remember' | 'buy' | 'people' | 'random'
+export type NudgeType = 'move' | 'study' | 'brain' | 'checkin'
+export type NudgeResponse = 'yeah' | 'later' | 'not_today'
+export type DistractionReason = 'tired' | 'distracted' | 'avoiding' | 'entertainment' | 'unknown'
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string
+          display_name: string | null
+          created_at: string
+        }
+        Insert: {
+          id: string
+          display_name?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
+      }
+      brain_items: {
+        Row: {
+          id: string
+          user_id: string
+          content: string
+          category: BrainCategory
+          is_idea: boolean
+          archived: boolean
+          source: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          content: string
+          category?: BrainCategory
+          archived?: boolean
+          source?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['brain_items']['Insert']>
+      }
+      nudge_responses: {
+        Row: {
+          id: string
+          user_id: string
+          nudge_type: NudgeType
+          nudge_message: string | null
+          response: NudgeResponse
+          responded_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          nudge_type: NudgeType
+          nudge_message?: string | null
+          response: NudgeResponse
+          responded_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['nudge_responses']['Insert']>
+      }
+      reality_checks: {
+        Row: {
+          id: string
+          user_id: string
+          intended_task: string | null
+          was_on_task: boolean | null
+          distraction_reason: DistractionReason | null
+          restarted: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          intended_task?: string | null
+          was_on_task?: boolean | null
+          distraction_reason?: DistractionReason | null
+          restarted?: boolean
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['reality_checks']['Insert']>
+      }
+      comebacks: {
+        Row: {
+          id: string
+          user_id: string
+          returned_on: string
+          gap_days: number | null
+          restart_action: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          returned_on?: string
+          gap_days?: number | null
+          restart_action?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['comebacks']['Insert']>
+      }
+    }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+  }
+}
