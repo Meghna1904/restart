@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '@iconify/react'
 import { useAuth } from '../../contexts/AuthContext'
-import { useBrainCounts, useAddBrainItem } from '../../hooks/useBrainDump'
+import { useBrainCounts, useAddBrainItem, useUpdateBrainCategory } from '../../hooks/useBrainDump'
 import { useShouldShowNudge, getCurrentNudgeType, getNudgeMessage, useLogNudgeResponse, NUDGES } from '../../hooks/useNudges'
 import { greeting } from '../../lib/utils'
 import { useToast } from '../../contexts/ToastContext'
 import { useAddScrollLog } from '../../hooks/useScrollLogs'
+import { useLogRealityCheck } from '../../hooks/useRealityCheck'
+import { todayLocal } from '../../lib/utils'
+import type { BrainCategory, DistractionReason } from '../../lib/database.types'
 
 function todayLabel() {
   const d = new Date()
@@ -57,12 +60,14 @@ export default function HomePage() {
   const { profile, user } = useAuth()
   const { data: countsData, error: countsError } = useBrainCounts()
   const addBrainItem = useAddBrainItem()
+  const updateBrainCategory = useUpdateBrainCategory()
   
   const showNudge = useShouldShowNudge()
   const nudgeType = getCurrentNudgeType()
   const logNudge = useLogNudgeResponse()
   const { toast } = useToast()
   const addScrollLog = useAddScrollLog()
+  const logRealityCheck = useLogRealityCheck()
   
   const [dumpText, setDumpText] = useState('')
   const [realityCheckOpen, setRealityCheckOpen] = useState(false)
@@ -86,7 +91,8 @@ export default function HomePage() {
   const [beforeAiOpen, setBeforeAiOpen] = useState(false)
   const [beforeAi, setBeforeAi] = useState({ understand: '', tried: '', example: '', stuck: '' })
 
-  const todayKey = `restart-today-${user?.id ?? 'guest'}-${new Date().toISOString().slice(0, 10)}`
+  const [capturedItemId, setCapturedItemId] = useState<string | null>(null)
+  const todayKey = `restart-today-${user?.id ?? 'guest'}-${todayLocal()}`
   const noteKey = `${todayKey}-note`
   const scratchpadKey = `${todayKey}-before-ai`
 
@@ -102,6 +108,8 @@ export default function HomePage() {
     setReflection(localStorage.getItem(noteKey) ?? '')
     setFriction(localStorage.getItem(`${todayKey}-friction`) ?? '')
     setMinimumDone(!!localStorage.getItem(`${todayKey}-minimum`))
+    const savedEnergy = localStorage.getItem(`${todayKey}-energy`) as Energy | null
+    if (savedEnergy && savedEnergy in ENERGY_COPY) setEnergy(savedEnergy)
     const savedScratchpad = localStorage.getItem(scratchpadKey)
     if (savedScratchpad) {
       try {
@@ -157,9 +165,29 @@ export default function HomePage() {
 
   const handleDump = async () => {
     if (!dumpText.trim()) return
-    await addBrainItem.mutateAsync({ content: dumpText, source: 'quick' })
+    const item = await addBrainItem.mutateAsync({ content: dumpText, source: 'quick' })
     setDumpText('')
+    setCapturedItemId(item.id)
     setDumpSortOpen(true)
+  }
+
+  const chooseEnergy = (value: Energy) => {
+    setEnergy(value)
+    localStorage.setItem(`${todayKey}-energy`, value)
+  }
+
+  const updateCapturedCategory = async (id: string, category: BrainCategory) => {
+    await updateBrainCategory.mutateAsync({ id, category })
+  }
+
+  const finishRealityCheck = (wasOnTask: boolean, distractionReason?: DistractionReason, restarted = false) => {
+    logRealityCheck.mutate({
+      intendedTask,
+      wasOnTask,
+      distractionReason,
+      restarted,
+    })
+    setRealityStep('done')
   }
 
   const { day, date } = todayLabel()
@@ -197,7 +225,7 @@ export default function HomePage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 15 }}>
           {(['low', 'middle', 'ready'] as Energy[]).map(level => (
-            <button key={level} type="button" className={`btn ${energy === level ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 42, padding: '8px 6px', fontSize: '0.78rem' }} onClick={() => setEnergy(level)}>
+            <button key={level} type="button" className={`btn ${energy === level ? 'btn-primary' : 'btn-ghost'}`} style={{ minHeight: 42, padding: '8px 6px', fontSize: '0.78rem' }} onClick={() => chooseEnergy(level)}>
               {ENERGY_COPY[level].label}
             </button>
           ))}
@@ -362,8 +390,19 @@ export default function HomePage() {
           <div style={{ marginTop: 14, padding: 14, borderRadius: 14, background: 'color-mix(in srgb, var(--primary) 9%, transparent)' }}>
             <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: 9 }}>Captured. What should this become?</p>
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-              {['keep as a thought', 'tiny action', 'question to revisit', 'let it rest'].map(choice => (
-                <button key={choice} type="button" className="btn btn-ghost btn-sm" onClick={() => { setDumpSortOpen(false); toast(choice === 'let it rest' ? 'It can rest here.' : `Saved as ${choice}.`, 'success') }}>{choice}</button>
+              {[
+                ['keep as a thought', 'random'],
+                ['tiny action', 'remember'],
+                ['question to revisit', 'learn'],
+                ['let it rest', 'random'],
+              ].map(([choice, category]) => (
+                <button key={choice} type="button" className="btn btn-ghost btn-sm" onClick={async () => {
+                  if (capturedItemId) {
+                    await updateCapturedCategory(capturedItemId, category as BrainCategory)
+                  }
+                  setDumpSortOpen(false)
+                  toast(choice === 'let it rest' ? 'It can rest here.' : `Saved as ${choice}.`, 'success')
+                }}>{choice}</button>
               ))}
             </div>
           </div>
@@ -524,7 +563,7 @@ export default function HomePage() {
               <div style={{ marginTop: 24 }}>
                 <p style={{ color: 'var(--muted-foreground)', marginBottom: 18 }}>Are you doing that right now?</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <button className="btn btn-primary" onClick={() => setRealityStep('done')}>yes, I am</button>
+                  <button className="btn btn-primary" onClick={() => finishRealityCheck(true)}>yes, I am</button>
                   <button className="btn btn-ghost" onClick={() => setRealityStep('reason')}>not really</button>
                 </div>
               </div>
@@ -534,13 +573,30 @@ export default function HomePage() {
               <div style={{ marginTop: 24 }}>
                 <p style={{ color: 'var(--muted-foreground)', marginBottom: 14 }}>What happened?</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                  {['tired', 'distracted', 'avoiding it', 'wanted entertainment', 'forgot', 'got carried away'].map(reason => (
-                    <button key={reason} className={`btn ${selectedReason === reason ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSelectedReason(reason)}>
-                      {reason}
+                  {[
+                    ['tired', 'tired'],
+                    ['distracted', 'distracted'],
+                    ['avoiding it', 'avoiding'],
+                    ['wanted entertainment', 'entertainment'],
+                    ['forgot', 'unknown'],
+                    ['got carried away', 'distracted'],
+                  ].map(([label]) => (
+                    <button key={label} className={`btn ${selectedReason === label ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSelectedReason(label)}>
+                      {label}
                     </button>
                   ))}
                 </div>
-                <button className="btn btn-cta btn-full" style={{ marginTop: 16 }} disabled={!selectedReason} onClick={() => setRealityStep('done')}>okay, thanks for noticing</button>
+                <button className="btn btn-cta btn-full" style={{ marginTop: 16 }} disabled={!selectedReason || logRealityCheck.isPending} onClick={() => {
+                  const reasonMap: Record<string, DistractionReason> = {
+                    tired: 'tired',
+                    distracted: 'distracted',
+                    'avoiding it': 'avoiding',
+                    'wanted entertainment': 'entertainment',
+                    forgot: 'unknown',
+                    'got carried away': 'distracted',
+                  }
+                  finishRealityCheck(false, reasonMap[selectedReason], true)
+                }}>okay, thanks for noticing</button>
               </div>
             )}
 
