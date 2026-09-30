@@ -436,6 +436,7 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
 
 @media (max-width: 600px) {
   .page-content { padding-inline: 20px; }
+  .priority-grid { grid-template-columns: 1fr !important; }
 }
 
 .tab-item {
