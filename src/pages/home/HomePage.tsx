@@ -34,6 +34,8 @@ const ENERGY_COPY: Record<Energy, { label: string; description: string }> = {
   ready: { label: 'ready enough', description: 'You can sit with a little more friction today.' },
 }
 
+const GOAT_BACKGROUND_VIDEO = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_083515_290e5a10-0b95-41af-a5e2-32b6389baa4d.mp4'
+
 const PRIORITIES: Priority[] = [
   {
     id: 'move',
@@ -165,6 +167,9 @@ export default function HomePage() {
 
   return (
     <div className="animate-fade-in restart-home" style={{ paddingTop: 40, paddingBottom: 64 }}>
+      <div className="home-goat-background" aria-hidden="true">
+        <video src={GOAT_BACKGROUND_VIDEO} autoPlay muted loop playsInline preload="metadata" />
+      </div>
       <header className="restart-home-hero" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20, marginBottom: 20 }}>
         <div>
           <span className="restart-kicker">{day} · {date}</span>

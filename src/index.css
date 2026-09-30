@@ -220,6 +220,39 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 170px;
   padding: 6px 0 18px;
 }
+.home-goat-background {
+  position: absolute;
+  inset: -120px -20vw auto;
+  height: min(720px, 72vh);
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 0 0 48% 48%;
+  opacity: .8;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,.9) 48%, transparent 100%);
+}
+.home-goat-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5,5,5,.25), rgba(5,5,5,.75) 72%, #050505 100%);
+}
+.home-goat-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.78) contrast(1.05);
+}
+.cinematic-shell .restart-home { position: relative; }
+.cinematic-shell .restart-home > *:not(.home-goat-background) {
+  position: relative;
+  z-index: 1;
+}
+.cinematic-shell .home-goat-background { z-index: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .home-goat-background video { display: none; }
+}
 .restart-home-hero h1,
 .restart-home h2,
 .restart-home .section-title {
@@ -546,6 +579,7 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
   .restart-home-hero { min-height: 145px; }
   .restart-orbit { width: 88px; height: 88px; right: 2%; top: 6px; }
   .restart-home-hero h1 { font-size: clamp(2.1rem, 11vw, 3.2rem) !important; }
+  .home-goat-background { inset: -90px -40vw auto; height: 560px; opacity: .68; }
 }
 
 .tab-item {
