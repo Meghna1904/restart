@@ -4,6 +4,8 @@ import { useAuth } from './contexts/AuthContext'
 import TabBar from './components/TabBar'
 import AuthPage from './pages/auth/AuthPage'
 import HomePage from './pages/home/HomePage'
+import BrainPage from './pages/brain/BrainPage'
+import IdeasPage from './pages/ideas/IdeasPage'
 import VaultPage from './pages/vault/VaultPage'
 import MePage from './pages/me/MePage'
 
@@ -43,6 +45,8 @@ export default function App() {
       <Route path="/auth" element={session ? <Navigate to="/home" replace /> : <AuthPage />} />
       
       <Route path="/home" element={<Protected><AppShell><HomePage /></AppShell></Protected>} />
+      <Route path="/brain" element={<Protected><AppShell><BrainPage /></AppShell></Protected>} />
+      <Route path="/ideas" element={<Protected><AppShell><IdeasPage /></AppShell></Protected>} />
       <Route path="/vault" element={<Protected><AppShell><VaultPage /></AppShell></Protected>} />
       <Route path="/me" element={<Protected><AppShell><MePage /></AppShell></Protected>} />
       

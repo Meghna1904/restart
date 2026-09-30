@@ -15,8 +15,9 @@ export default function BrainPage() {
 
   return (
     <div className="animate-fade-in" style={{ paddingTop: 32, paddingBottom: 64 }}>
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.75rem', fontFamily: 'var(--font-heading)', color: 'var(--foreground)' }}>
+      <header style={{ marginBottom: 24, paddingTop: 40 }}>
+        <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Your unfiltered corner</p>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.05em' }}>
           Brain
         </h1>
         <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9375rem', marginTop: 4 }}>

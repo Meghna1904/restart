@@ -23,6 +23,10 @@ export default function HomePage() {
   const logNudge = useLogNudgeResponse()
   
   const [dumpText, setDumpText] = useState('')
+  const [realityCheckOpen, setRealityCheckOpen] = useState(false)
+  const [realityStep, setRealityStep] = useState<'prompt' | 'answer' | 'reason' | 'done'>('prompt')
+  const [intendedTask, setIntendedTask] = useState('')
+  const [selectedReason, setSelectedReason] = useState('')
 
   const handleDump = async () => {
     if (!dumpText.trim()) return
@@ -136,11 +140,82 @@ export default function HomePage() {
           cursor: 'pointer',
           zIndex: 40
         }}
-        onClick={() => { /* Open Reality Check Modal */ }}
+        onClick={() => {
+          setRealityCheckOpen(true)
+          setRealityStep('prompt')
+          setIntendedTask('')
+          setSelectedReason('')
+        }}
       >
         <Icon icon="lucide:crosshair" width={18} height={18} />
         What was I doing?
       </button>
+
+      {realityCheckOpen && (
+        <div className="modal-overlay" role="presentation" onClick={() => setRealityCheckOpen(false)}>
+          <section className="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="reality-check-title" onClick={event => event.stopPropagation()}>
+            <div className="sheet-handle" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 16 }}>
+              <div>
+                <p className="section-title" style={{ color: 'var(--primary)', marginBottom: 8 }}>tiny reality check</p>
+                <h2 id="reality-check-title" style={{ fontSize: '1.65rem', letterSpacing: '-0.04em' }}>
+                  {realityStep === 'done' ? 'No pressure.' : 'What were you supposed to be doing?'}
+                </h2>
+              </div>
+              <button className="btn btn-ghost btn-sm" aria-label="Close reality check" onClick={() => setRealityCheckOpen(false)}>✕</button>
+            </div>
+
+            {realityStep === 'prompt' && (
+              <div className="gap-stack" style={{ marginTop: 24 }}>
+                <textarea
+                  className="input"
+                  placeholder="studying HashMap, sending that email..."
+                  value={intendedTask}
+                  onChange={event => setIntendedTask(event.target.value)}
+                  autoFocus
+                />
+                <button className="btn btn-primary btn-full" disabled={!intendedTask.trim()} onClick={() => setRealityStep('answer')}>okay, next</button>
+              </div>
+            )}
+
+            {realityStep === 'answer' && (
+              <div style={{ marginTop: 24 }}>
+                <p style={{ color: 'var(--muted-foreground)', marginBottom: 18 }}>Are you doing that right now?</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <button className="btn btn-primary" onClick={() => setRealityStep('done')}>yes, I am</button>
+                  <button className="btn btn-ghost" onClick={() => setRealityStep('reason')}>not really</button>
+                </div>
+              </div>
+            )}
+
+            {realityStep === 'reason' && (
+              <div style={{ marginTop: 24 }}>
+                <p style={{ color: 'var(--muted-foreground)', marginBottom: 14 }}>What happened?</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {['tired', 'distracted', 'avoiding it', 'wanted entertainment', 'forgot', 'got carried away'].map(reason => (
+                    <button key={reason} className={`btn ${selectedReason === reason ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSelectedReason(reason)}>
+                      {reason}
+                    </button>
+                  ))}
+                </div>
+                <button className="btn btn-cta btn-full" style={{ marginTop: 16 }} disabled={!selectedReason} onClick={() => setRealityStep('done')}>okay, thanks for noticing</button>
+              </div>
+            )}
+
+            {realityStep === 'done' && (
+              <div style={{ marginTop: 24 }}>
+                <p style={{ color: 'var(--muted-foreground)', lineHeight: 1.6, marginBottom: 20 }}>
+                  {selectedReason ? 'Happens. You noticed, and that counts.' : 'Lovely. Keep going gently.'}
+                </p>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setRealityCheckOpen(false)}>restart gently</button>
+                  <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setRealityCheckOpen(false)}>not now</button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
 
     </div>
   )

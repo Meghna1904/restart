@@ -3,6 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom'
 
 const TABS = [
   { to: '/home',   label: 'Now',     icon: 'lucide:sun' },
+  { to: '/brain',  label: 'Brain',   icon: 'lucide:brain' },
+  { to: '/ideas',  label: 'Ideas',   icon: 'lucide:lightbulb' },
   { to: '/vault',  label: 'Vault',   icon: 'lucide:archive' },
   { to: '/me',     label: 'Me',      icon: 'lucide:user' },
 ]
