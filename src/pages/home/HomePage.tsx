@@ -34,28 +34,36 @@ export default function HomePage() {
   const counts = countsData?.counts ?? {}
 
   return (
-    <div className="animate-fade-in" style={{ paddingTop: 32, paddingBottom: 64 }}>
-      {/* Date Header */}
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <p style={{ fontSize: '1rem', color: 'var(--muted-foreground)', fontWeight: 500 }}>{day}</p>
-        <p style={{ fontSize: '1.25rem', fontFamily: 'var(--font-heading)', color: 'var(--foreground)', fontWeight: 700 }}>{date}</p>
-      </div>
+    <div className="animate-fade-in" style={{ paddingTop: 40, paddingBottom: 64 }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20, marginBottom: 28 }}>
+        <div>
+          <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>{day} · {date}</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', letterSpacing: '-0.05em', lineHeight: 1.05 }}>A softer way<br />to get things done.</h1>
+        </div>
+        <div className="tag-pill" style={{ flexShrink: 0, background: 'rgba(126, 214, 192, 0.12)', borderColor: 'rgba(126, 214, 192, 0.2)' }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--primary)' }} /> grounded
+        </div>
+      </header>
 
-      <p style={{ fontSize: '1.125rem', marginBottom: 24, textAlign: 'center', fontWeight: 500 }}>
-        {greeting(profile?.display_name)}
+      <p style={{ fontSize: '1.05rem', color: 'var(--muted-foreground)', marginBottom: 28 }}>
+        {greeting(profile?.display_name)} Take a breath, then choose one small next step.
       </p>
 
       {/* Brain Dump Input */}
-      <div className="card" style={{ marginBottom: 32, padding: '24px 20px', background: 'var(--surface-2)' }}>
-        <p style={{ fontWeight: 600, fontSize: '0.9375rem', marginBottom: 16, textAlign: 'center' }}>
-          what's on your mind?
-        </p>
+      <div className="card" style={{ marginBottom: 24, padding: 24, background: 'linear-gradient(145deg, var(--card), var(--surface-2))' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
+          <div>
+            <p style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>Quick capture</p>
+            <h2 style={{ fontSize: '1.35rem', letterSpacing: '-0.03em' }}>What's on your mind?</h2>
+          </div>
+          <span style={{ fontSize: '1.6rem' }} aria-hidden="true">✦</span>
+        </div>
         <textarea
           className="input"
           placeholder="I should make an app that turns Reddit saves into..."
           value={dumpText}
           onChange={e => setDumpText(e.target.value)}
-          style={{ minHeight: 120, background: 'var(--background)', marginBottom: 12, border: 'none' }}
+          style={{ minHeight: 112, background: 'var(--background)', marginBottom: 12, border: '1px solid var(--border)' }}
         />
         <button 
           className="btn btn-cta btn-full"
@@ -97,10 +105,12 @@ export default function HomePage() {
         </div>
       )}
 
-      <div className="divider" style={{ margin: '32px 0' }} />
+      <div className="section-header" style={{ margin: '32px 0 14px' }}>
+        <h2 className="section-title">Your space</h2>
+        <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>a little at a time</span>
+      </div>
 
-      {/* Simplified Stats / Buckets */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
         <BucketRow icon="💡" count={counts.ideas ?? 0} label="ideas" color="#ee9b00" />
         <BucketRow icon="🧠" count={countsData?.total ?? 0} label="things on my mind" color="#94d2bd" />
         <BucketRow icon="↩" count={0} label="comebacks" color="#0a9396" />
@@ -147,9 +157,9 @@ function BucketRow({ icon, count, label, color }: { icon: string, count: number,
       }}>
         {icon}
       </div>
-      <div>
+      <div style={{ minWidth: 0 }}>
         <span style={{ fontWeight: 700, fontSize: '1.0625rem', color: 'var(--foreground)' }}>{count}</span>
-        <span style={{ fontSize: '0.9375rem', color: 'var(--muted-foreground)', marginLeft: 8 }}>{label}</span>
+        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
       </div>
     </div>
   )

@@ -57,33 +57,34 @@ export default function AuthPage() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px 20px',
-      background: 'var(--bg)',
+      padding: '40px 20px',
+      background: 'radial-gradient(circle at 15% 15%, rgba(126,214,192,.14), transparent 34%), radial-gradient(circle at 85% 85%, rgba(245,199,122,.12), transparent 30%), var(--background)',
     }}>
       {/* Logo */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{
-          width: 64,
-          height: 64,
-          borderRadius: 18,
-          background: 'linear-gradient(135deg, var(--deep-teal), var(--teal))',
+          width: 72,
+          height: 72,
+          borderRadius: 24,
+          background: 'linear-gradient(135deg, var(--primary), var(--accent))',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '1.75rem',
+          fontSize: '2rem',
+          color: 'var(--primary-foreground)',
           margin: '0 auto 16px',
-          boxShadow: '0 8px 24px rgba(10, 147, 150, 0.35)',
+          boxShadow: '0 14px 32px rgba(126, 214, 192, 0.24)',
         }}>
-          ↺
+          ✦
         </div>
-        <h1 style={{ fontSize: '1.75rem', color: 'var(--heading)', marginBottom: 6 }}>restart</h1>
+        <h1 style={{ fontSize: '2rem', color: 'var(--foreground)', letterSpacing: '-0.06em', marginBottom: 6 }}>restart</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
-          {mode === 'signup' ? 'create your account' : 'welcome back'}
+          {mode === 'signup' ? 'a fresh start for your attention' : 'welcome back to your calm corner'}
         </p>
       </div>
 
       {/* Card */}
-      <div className="card-elevated" style={{ width: '100%', maxWidth: 400 }}>
+      <div className="card-elevated" style={{ width: '100%', maxWidth: 420, boxShadow: 'var(--shadow-md)', background: 'color-mix(in srgb, var(--card) 90%, transparent)' }}>
         {magicSent ? (
           <div style={{ textAlign: 'center', padding: '12px 0' }} className="animate-fade-in">
             <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>📬</div>
@@ -204,8 +205,8 @@ export default function AuthPage() {
         )}
       </div>
 
-      <p style={{ marginTop: 32, fontSize: '0.8125rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 280 }}>
-        this is your personal space. no streaks, no pressure. just you.
+      <p style={{ marginTop: 24, fontSize: '0.8125rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 320 }}>
+        Your personal space for loose thoughts, deep focus, and gentle progress.
       </p>
     </div>
   )

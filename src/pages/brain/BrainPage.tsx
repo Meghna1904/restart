@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Icon } from '@iconify/react'
 import { useBrainItems, useUpdateBrainCategory, CATEGORY_META } from '../../hooks/useBrainDump'
 import type { BrainCategory } from '../../lib/database.types'
 

@@ -12,9 +12,18 @@ const OPTIONS: FocusOption[] = [
 ]
 
 export default function FocusPage() {
-  const [activeFocus, setActiveFocus] = useState<{ option: FocusOption, startTime: number } | null>(null)
+  const [activeFocus, setActiveFocus] = useState<{ option: FocusOption, startTime: number } | null>(() => {
+    const saved = localStorage.getItem('restart-active-focus')
+    if (!saved) return null
+    try { return JSON.parse(saved) as { option: FocusOption, startTime: number } } catch { return null }
+  })
   const [elapsed, setElapsed] = useState(0)
   const { toast } = useToast()
+
+  useEffect(() => {
+    if (activeFocus) localStorage.setItem('restart-active-focus', JSON.stringify(activeFocus))
+    else localStorage.removeItem('restart-active-focus')
+  }, [activeFocus])
 
   useEffect(() => {
     if (!activeFocus) return
@@ -39,8 +48,9 @@ export default function FocusPage() {
 
   return (
     <div className="animate-fade-in" style={{ paddingTop: 32, paddingBottom: 64 }}>
-      <header style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: '1.75rem', fontFamily: 'var(--font-heading)', color: 'var(--foreground)' }}>
+      <header style={{ marginBottom: 32, paddingTop: 40 }}>
+        <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Make room for one thing</p>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.05em' }}>
           Focus
         </h1>
         <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9375rem', marginTop: 4 }}>
@@ -56,7 +66,7 @@ export default function FocusPage() {
               className="card"
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '24px 12px', minHeight: 140, cursor: 'pointer', border: '1px solid var(--border)', background: 'var(--card)'
+                padding: '24px 12px', minHeight: 140, cursor: 'pointer', border: '1px solid var(--border)', background: 'var(--card)', transition: 'transform .2s ease, border-color .2s ease'
               }}
               onClick={() => handleStart(opt)}
             >
@@ -71,7 +81,7 @@ export default function FocusPage() {
           ))}
         </div>
       ) : (
-        <div className="card" style={{ padding: '32px 20px', textAlign: 'center', border: '1px solid var(--primary)', background: 'rgba(10, 147, 150, 0.05)' }}>
+        <div className="card" style={{ padding: '32px 20px', textAlign: 'center', border: '1px solid var(--primary)', background: 'linear-gradient(145deg, rgba(126, 214, 192, 0.12), var(--card))' }}>
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--primary)', color: 'var(--primary-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <Icon icon={activeFocus.option.icon} width={32} height={32} />
           </div>
@@ -87,7 +97,7 @@ export default function FocusPage() {
           </button>
           
           <p style={{ fontSize: '0.8125rem', color: 'var(--muted-foreground)', marginTop: 20 }}>
-            You can leave this page. The timer will keep running.
+            You can leave this page. Your session will keep running.
           </p>
         </div>
       )}
