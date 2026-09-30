@@ -1,50 +1,25 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
 
-type AuthMode = 'login' | 'magic' | 'signup'
-
 export default function AuthPage() {
-  const [mode, setMode] = useState<AuthMode>('login')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [loading, setLoading] = useState(false)
-  const [magicSent, setMagicSent] = useState(false)
   const { toast } = useToast()
 
-  const handleEmailPassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { display_name: displayName } },
-        })
-        if (error) throw error
-        toast('check your email to confirm your account', 'success')
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
-      }
-    } catch (err) {
-      toast((err as Error).message, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleEnter = async (event: React.FormEvent) => {
+    event.preventDefault()
+    const name = displayName.trim()
+    if (!name) return
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault()
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email })
+      const { error } = await supabase.auth.signInAnonymously({
+        options: { data: { display_name: name } },
+      })
       if (error) throw error
-      setMagicSent(true)
-    } catch (err) {
-      toast((err as Error).message, 'error')
+    } catch (error) {
+      toast((error as Error).message, 'error')
     } finally {
       setLoading(false)
     }
@@ -60,16 +35,14 @@ export default function AuthPage() {
       padding: '40px 20px',
       background: 'radial-gradient(circle at 15% 15%, rgba(126,214,192,.14), transparent 34%), radial-gradient(circle at 85% 85%, rgba(245,199,122,.12), transparent 30%), var(--background)',
     }}>
-      {/* Logo */}
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{
           width: 72,
           height: 72,
           borderRadius: 24,
           background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'grid',
+          placeItems: 'center',
           fontSize: '2rem',
           color: 'var(--primary-foreground)',
           margin: '0 auto 16px',
@@ -78,135 +51,44 @@ export default function AuthPage() {
           ✦
         </div>
         <h1 style={{ fontSize: '2rem', color: 'var(--foreground)', letterSpacing: '-0.06em', marginBottom: 6 }}>restart</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>
-          {mode === 'signup' ? 'a fresh start for your attention' : 'welcome back to your calm corner'}
+        <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9375rem' }}>
+          a fresh start for your attention
         </p>
       </div>
 
-      {/* Card */}
       <div className="card-elevated" style={{ width: '100%', maxWidth: 420, boxShadow: 'var(--shadow-md)', background: 'color-mix(in srgb, var(--card) 90%, transparent)' }}>
-        {magicSent ? (
-          <div style={{ textAlign: 'center', padding: '12px 0' }} className="animate-fade-in">
-            <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>📬</div>
-            <p style={{ color: 'var(--text)', fontWeight: 500, marginBottom: 8 }}>
-              check your email
-            </p>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              we sent a magic link to <strong style={{ color: 'var(--text)' }}>{email}</strong>
-            </p>
-            <button
-              className="btn btn-ghost btn-full"
-              style={{ marginTop: 20 }}
-              onClick={() => setMagicSent(false)}
-            >
-              try a different email
-            </button>
+        <form onSubmit={handleEnter} className="gap-stack">
+          <div>
+            <label className="label" htmlFor="display-name">What should we call you?</label>
+            <input
+              id="display-name"
+              type="text"
+              className="input"
+              placeholder="Your name"
+              value={displayName}
+              onChange={event => setDisplayName(event.target.value)}
+              required
+              maxLength={80}
+              autoComplete="name"
+              autoFocus
+            />
           </div>
-        ) : mode === 'magic' ? (
-          <form onSubmit={handleMagicLink} className="gap-stack">
-            <div>
-              <label className="label" htmlFor="magic-email">email</label>
-              <input
-                id="magic-email"
-                type="email"
-                className="input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-            <button
-              id="magic-link-btn"
-              type="submit"
-              className="btn btn-primary btn-full"
-              disabled={loading}
-            >
-              {loading ? 'sending…' : 'send magic link'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-ghost btn-full btn-sm"
-              onClick={() => setMode('login')}
-            >
-              use password instead
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleEmailPassword} className="gap-stack">
-            {mode === 'signup' && (
-              <div>
-                <label className="label" htmlFor="display-name">your name</label>
-                <input
-                  id="display-name"
-                  type="text"
-                  className="input"
-                  placeholder="how should we greet you?"
-                  value={displayName}
-                  onChange={e => setDisplayName(e.target.value)}
-                  autoComplete="name"
-                />
-              </div>
-            )}
-            <div>
-              <label className="label" htmlFor="auth-email">email</label>
-              <input
-                id="auth-email"
-                type="email"
-                className="input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="auth-password">password</label>
-              <input
-                id="auth-password"
-                type="password"
-                className="input"
-                placeholder={mode === 'signup' ? 'at least 8 characters' : '••••••••'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                minLength={8}
-                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-              />
-            </div>
-            <button
-              id="auth-submit-btn"
-              type="submit"
-              className="btn btn-primary btn-full"
-              disabled={loading}
-            >
-              {loading ? '…' : mode === 'signup' ? 'create account' : 'sign in'}
-            </button>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-              <button
-                type="button"
-                className="btn btn-ghost btn-full btn-sm"
-                onClick={() => setMode('magic')}
-              >
-                sign in with magic link instead
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost btn-full btn-sm"
-                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              >
-                {mode === 'login' ? "don't have an account? sign up" : 'already have an account? sign in'}
-              </button>
-            </div>
-          </form>
-        )}
+          <button
+            id="enter-app-btn"
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loading || !displayName.trim()}
+          >
+            {loading ? 'setting up your space…' : 'enter restart'}
+          </button>
+        </form>
+        <p style={{ marginTop: 18, textAlign: 'center', color: 'var(--muted-foreground)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+          No email, password, or account recovery. Your space stays on this browser.
+        </p>
       </div>
 
-      <p style={{ marginTop: 24, fontSize: '0.8125rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 320 }}>
-        Your personal space for loose thoughts, deep focus, and gentle progress.
+      <p style={{ marginTop: 24, fontSize: '0.8125rem', color: 'var(--muted-foreground)', textAlign: 'center', maxWidth: 320 }}>
+        A personal space for loose thoughts, deep focus, and gentle progress.
       </p>
     </div>
   )
