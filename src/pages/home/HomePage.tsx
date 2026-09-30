@@ -5,6 +5,7 @@ import { useBrainCounts, useAddBrainItem } from '../../hooks/useBrainDump'
 import { useShouldShowNudge, getCurrentNudgeType, getNudgeMessage, useLogNudgeResponse, NUDGES } from '../../hooks/useNudges'
 import { greeting } from '../../lib/utils'
 import { useToast } from '../../contexts/ToastContext'
+import { useAddScrollLog } from '../../hooks/useScrollLogs'
 
 function todayLabel() {
   const d = new Date()
@@ -43,6 +44,7 @@ export default function HomePage() {
   const nudgeType = getCurrentNudgeType()
   const logNudge = useLogNudgeResponse()
   const { toast } = useToast()
+  const addScrollLog = useAddScrollLog()
   
   const [dumpText, setDumpText] = useState('')
   const [realityCheckOpen, setRealityCheckOpen] = useState(false)
@@ -54,6 +56,9 @@ export default function HomePage() {
     study: { step: 0, done: false },
   })
   const [reflection, setReflection] = useState('')
+  const [scrollApp, setScrollApp] = useState('Instagram')
+  const [scrollMinutes, setScrollMinutes] = useState('')
+  const [scrollReason, setScrollReason] = useState('')
 
   const todayKey = `restart-today-${user?.id ?? 'guest'}-${new Date().toISOString().slice(0, 10)}`
   const noteKey = `${todayKey}-note`
@@ -169,6 +174,46 @@ export default function HomePage() {
           style={{ minHeight: 72, background: 'transparent', borderStyle: reflection ? 'solid' : 'dashed', resize: 'vertical' }}
         />
         {reflection && <p style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem', marginTop: 6 }}>kept in this browser · no score attached</p>}
+      </section>
+
+      <section className="card scroll-card" style={{ marginBottom: 24, padding: 22, background: 'linear-gradient(145deg, rgba(245,199,122,.1), var(--card))' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start' }}>
+          <div>
+            <p style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Notice, don’t punish</p>
+            <h2 style={{ fontSize: '1.3rem', letterSpacing: '-0.03em' }}>How did scrolling fit today?</h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem', marginTop: 5 }}>A rough memory is useful. You never need to track it live.</p>
+          </div>
+          <span className="scroll-orbit" aria-hidden="true">◌</span>
+        </div>
+        <div className="scroll-form" style={{ display: 'grid', gridTemplateColumns: '1fr 0.75fr', gap: 8, marginTop: 16 }}>
+          <select className="input" value={scrollApp} onChange={event => setScrollApp(event.target.value)} aria-label="App">
+            <option>Instagram</option>
+            <option>YouTube</option>
+            <option>Shorts</option>
+            <option>Reddit</option>
+            <option>Other</option>
+          </select>
+          <div style={{ position: 'relative' }}>
+            <input className="input" type="number" min="1" max="1440" placeholder="minutes" value={scrollMinutes} onChange={event => setScrollMinutes(event.target.value)} aria-label="Minutes scrolled" />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          {['bored', 'avoiding', 'tired', 'habit'].map(reason => (
+            <button key={reason} type="button" className={`tag-pill ${scrollReason === reason ? 'selected-chip' : ''}`} onClick={() => setScrollReason(scrollReason === reason ? '' : reason)}>{reason}</button>
+          ))}
+        </div>
+        <button
+          className="btn btn-ghost btn-full"
+          style={{ marginTop: 14 }}
+          disabled={!scrollMinutes || addScrollLog.isPending}
+          onClick={async () => {
+            await addScrollLog.mutateAsync({ app: scrollApp, minutes: Number(scrollMinutes), reason: scrollReason })
+            setScrollMinutes('')
+            setScrollReason('')
+          }}
+        >
+          {addScrollLog.isPending ? 'noting it…' : 'save a rough note'}
+        </button>
       </section>
 
       {/* Brain Dump Input */}

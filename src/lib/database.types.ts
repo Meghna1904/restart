@@ -107,6 +107,30 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['comebacks']['Insert']>
       }
+      scroll_logs: {
+        Relationships: [],
+        Row: {
+          id: string
+          user_id: string
+          log_date: string
+          app: string
+          minutes: number
+          time_of_day: string | null
+          reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          log_date: string
+          app: string
+          minutes: number
+          time_of_day?: string | null
+          reason?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['scroll_logs']['Insert']>
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

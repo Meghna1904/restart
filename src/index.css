@@ -579,6 +579,25 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
   color: var(--primary);
   border: 1px solid rgba(10, 147, 150, 0.2);
 }
+.tag-pill.selected-chip { background: rgba(245, 199, 122, 0.18); color: var(--accent); border-color: rgba(245, 199, 122, 0.4); }
+
+.scroll-card { animation: card-rise 0.7s 0.15s both; }
+.scroll-orbit {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(245, 199, 122, 0.35);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 1.7rem;
+  animation: orbit-drift 4s ease-in-out infinite;
+}
+@keyframes card-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes orbit-drift { 0%, 100% { transform: rotate(-12deg) translateY(0); } 50% { transform: rotate(12deg) translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .scroll-card, .scroll-orbit { animation: none; }
+}
 
 /* Category stripes */
 .stripe-jobs     { border-left: 4px solid var(--secondary); }
