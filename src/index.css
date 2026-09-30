@@ -598,6 +598,31 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) {
   .scroll-card, .scroll-orbit { animation: none; }
 }
+.insight-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid rgba(126, 214, 192, 0.22);
+  border-radius: 1.25rem;
+  background: radial-gradient(circle at 100% 0%, rgba(245,199,122,.14), transparent 40%), linear-gradient(145deg, rgba(126,214,192,.12), var(--card));
+}
+.insight-spark {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  color: var(--accent);
+  font-size: 2.2rem;
+  animation: orbit-drift 4s ease-in-out infinite;
+}
+.insight-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.insight-heading { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.insight-heading > div { display: flex; align-items: center; gap: 9px; }
+.insight-heading h2 { font-size: 1rem; letter-spacing: -0.02em; }
+.insight-icon { color: var(--primary); font-size: 1.3rem; }
+.empty-insight { color: var(--muted-foreground); font-size: .88rem; margin-top: 22px; line-height: 1.5; }
+@media (max-width: 680px) {
+  .insight-grid { grid-template-columns: 1fr; }
+}
 
 /* Category stripes */
 .stripe-jobs     { border-left: 4px solid var(--secondary); }

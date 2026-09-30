@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
@@ -6,6 +6,26 @@ import { todayLocal } from '../lib/utils'
 
 const hour = new Date().getHours()
 const timeOfDay = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'night'
+
+export function useScrollLogs() {
+  const { user } = useAuth()
+
+  return useQuery({
+    queryKey: ['scroll_logs', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('scroll_logs')
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('log_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(100)
+      if (error) throw error
+      return data
+    },
+  })
+}
 
 export function useAddScrollLog() {
   const { user } = useAuth()

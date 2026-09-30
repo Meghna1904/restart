@@ -7,6 +7,7 @@ const TABS = [
   { to: '/ideas',  label: 'Ideas',   icon: 'lucide:lightbulb' },
   { to: '/vault',  label: 'Vault',   icon: 'lucide:archive' },
   { to: '/me',     label: 'Me',      icon: 'lucide:user' },
+  { to: '/insights', label: 'Patterns', icon: 'lucide:sparkles' },
 ]
 
 export default function TabBar() {

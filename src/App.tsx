@@ -8,6 +8,7 @@ import BrainPage from './pages/brain/BrainPage'
 import IdeasPage from './pages/ideas/IdeasPage'
 import VaultPage from './pages/vault/VaultPage'
 import MePage from './pages/me/MePage'
+import InsightsPage from './pages/insights/InsightsPage'
 
 // Protected route wrapper
 function Protected({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/ideas" element={<Protected><AppShell><IdeasPage /></AppShell></Protected>} />
       <Route path="/vault" element={<Protected><AppShell><VaultPage /></AppShell></Protected>} />
       <Route path="/me" element={<Protected><AppShell><MePage /></AppShell></Protected>} />
+      <Route path="/insights" element={<Protected><AppShell><InsightsPage /></AppShell></Protected>} />
       
       {/* Fallback to home if logged in, auth if not */}
       <Route path="*" element={<Navigate to={session ? '/home' : '/auth'} replace />} />
