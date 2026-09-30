@@ -9,6 +9,7 @@ export interface Database {
   public: {
     Tables: {
       profiles: {
+        Relationships: [],
         Row: {
           id: string
           display_name: string | null
@@ -22,6 +23,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
       brain_items: {
+        Relationships: [],
         Row: {
           id: string
           user_id: string
@@ -44,6 +46,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['brain_items']['Insert']>
       }
       nudge_responses: {
+        Relationships: [],
         Row: {
           id: string
           user_id: string
@@ -63,6 +66,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['nudge_responses']['Insert']>
       }
       reality_checks: {
+        Relationships: [],
         Row: {
           id: string
           user_id: string
@@ -84,6 +88,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['reality_checks']['Insert']>
       }
       comebacks: {
+        Relationships: [],
         Row: {
           id: string
           user_id: string

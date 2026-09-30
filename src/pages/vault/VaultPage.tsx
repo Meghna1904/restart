@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { useBrainItems, useUpdateBrainCategory, useAddBrainItem, CATEGORY_META } from '../../hooks/useBrainDump'
+import { useBrainItems, useUpdateBrainCategory, useAddBrainItem, useArchiveBrainItem, CATEGORY_META } from '../../hooks/useBrainDump'
 import type { BrainCategory } from '../../lib/database.types'
 
 export default function VaultPage() {
   const { data: items, isLoading } = useBrainItems()
   const updateCategory = useUpdateBrainCategory()
+  const archiveItem = useArchiveBrainItem()
   const addItem = useAddBrainItem()
   
   const [filter, setFilter] = useState<BrainCategory | 'all'>('all')
@@ -29,8 +30,9 @@ export default function VaultPage() {
 
   return (
     <div className="animate-fade-in" style={{ paddingTop: 32, paddingBottom: 64 }}>
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: '1.75rem', fontFamily: 'var(--font-heading)', color: 'var(--foreground)' }}>
+      <header style={{ marginBottom: 24, paddingTop: 40 }}>
+        <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>Your external brain</p>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-0.05em' }}>
           Vault
         </h1>
         <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9375rem', marginTop: 4 }}>
@@ -116,16 +118,29 @@ export default function VaultPage() {
                   {new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
                 
-                <select 
-                  className="input"
-                  style={{ width: 'auto', padding: '4px 8px', minHeight: 'auto', fontSize: '0.75rem', borderRadius: 6, background: 'transparent', border: 'none', color: 'var(--muted-foreground)' }}
-                  value={item.category}
-                  onChange={e => updateCategory.mutate({ id: item.id, category: e.target.value as BrainCategory })}
-                >
-                  {(Object.keys(CATEGORY_META) as BrainCategory[]).map(cat => (
-                    <option key={cat} value={cat}>{CATEGORY_META[cat].emoji} {CATEGORY_META[cat].label}</option>
-                  ))}
-                </select>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <select 
+                    className="input"
+                    style={{ width: 'auto', padding: '4px 8px', minHeight: 'auto', fontSize: '0.75rem', borderRadius: 8, background: 'transparent', border: 'none', color: 'var(--muted-foreground)' }}
+                    value={item.category}
+                    aria-label={`Change category for ${item.content}`}
+                    onChange={e => updateCategory.mutate({ id: item.id, category: e.target.value as BrainCategory })}
+                  >
+                    {(Object.keys(CATEGORY_META) as BrainCategory[]).map(cat => (
+                      <option key={cat} value={cat}>{CATEGORY_META[cat].emoji} {CATEGORY_META[cat].label}</option>
+                    ))}
+                  </select>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    aria-label="Archive item"
+                    title="Archive item"
+                    onClick={() => archiveItem.mutate(item.id)}
+                    disabled={archiveItem.isPending}
+                    style={{ minHeight: 32, padding: '4px 8px', color: 'var(--muted-foreground)' }}
+                  >
+                    <Icon icon="lucide:archive-x" width={16} />
+                  </button>
+                </div>
               </div>
             </div>
           ))

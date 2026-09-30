@@ -38,40 +38,40 @@
 }
 
 :root {
-  --background: #001219;
-  --foreground: #f4efe0;
-  --primary: #0a9396;
-  --primary-foreground: #001219;
-  --secondary: #005f73;
-  --secondary-foreground: #f4efe0;
-  --tertiary: #94d2bd;
-  --tertiary-foreground: #001219;
-  --muted: #0b2530;
-  --muted-foreground: #b9c5bd;
-  --accent: #e9d8a6;
-  --accent-foreground: #001219;
-  --card: #0b2530;
-  --card-foreground: #f4efe0;
-  --destructive: #ae2012;
-  --destructive-foreground: #f4efe0;
-  --border: #1a4653;
-  --input: #1a4653;
-  --ring: #ee9b00;
-  --radius: 1rem;
-  --font-sans: Inter, sans-serif;
-  --font-heading: 'Plus Jakarta Sans', Inter, sans-serif;
+  --background: #071a1c;
+  --foreground: #f5f7f2;
+  --primary: #7ed6c0;
+  --primary-foreground: #071a1c;
+  --secondary: #153b3c;
+  --secondary-foreground: #f5f7f2;
+  --tertiary: #b6e8d4;
+  --tertiary-foreground: #071a1c;
+  --muted: #10282a;
+  --muted-foreground: #9db5af;
+  --accent: #f5c77a;
+  --accent-foreground: #071a1c;
+  --card: #10282a;
+  --card-foreground: #f5f7f2;
+  --destructive: #ef8c83;
+  --destructive-foreground: #071a1c;
+  --border: rgba(182, 232, 212, 0.14);
+  --input: rgba(182, 232, 212, 0.18);
+  --ring: #f5c77a;
+  --radius: 1.25rem;
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Fira Code', monospace;
 
   /* legacy compat */
   --ink: #001219;
   --teal: #0a9396;
-  --deep-teal: #005f73;
-  --mint: #94d2bd;
-  --amber: #ee9b00;
-  --rust: #bb3e03;
+  --deep-teal: #153b3c;
+  --mint: #b6e8d4;
+  --amber: #f5c77a;
+  --rust: #ef8c83;
   --bg: var(--background);
   --surface: var(--card);
-  --surface-2: #0f2f3e;
+  --surface-2: #153436;
   --text: var(--foreground);
   --text-muted: var(--muted-foreground);
   --heading: var(--accent);
@@ -84,8 +84,37 @@
   --z-modal: 100;
   --z-toast: 200;
   --z-nav: 50;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.18);
+  --shadow-md: 0 18px 48px rgba(0,0,0,0.24);
+}
+
+[data-theme='light'] {
+  --background: #f5f7f2;
+  --foreground: #10282a;
+  --primary: #167c6d;
+  --primary-foreground: #f5f7f2;
+  --secondary: #dceee7;
+  --secondary-foreground: #10282a;
+  --tertiary: #317f68;
+  --tertiary-foreground: #f5f7f2;
+  --muted: #e8f0ec;
+  --muted-foreground: #5d7770;
+  --accent: #b77718;
+  --accent-foreground: #fffaf0;
+  --card: #ffffff;
+  --card-foreground: #10282a;
+  --destructive: #b5463e;
+  --destructive-foreground: #fff;
+  --border: rgba(16, 40, 42, 0.12);
+  --input: rgba(16, 40, 42, 0.16);
+  --ring: #b77718;
+  --surface-2: #eef5f1;
+  --bg: var(--background);
+  --surface: var(--card);
+  --surface-2: #eef5f1;
+  --text: var(--foreground);
+  --text-muted: var(--muted-foreground);
+  --heading: #166657;
 }
 
 /* Text color overrides */
@@ -142,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  max-width: 430px;
+  width: min(100%, 1180px);
   margin: 0 auto;
   position: relative;
 }
@@ -150,7 +179,9 @@ h1, h2, h3, h4, h5, h6 {
 .page-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px 100px;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 0 28px 110px;
   padding-top: calc(env(safe-area-inset-top, 0px));
 }
 
@@ -167,6 +198,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .card-elevated {
@@ -370,7 +402,7 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 430px;
+  max-width: 680px;
   background: rgba(11, 37, 48, 0.97);
   border-top: 1px solid var(--border);
   display: flex;
@@ -379,6 +411,30 @@ textarea.input { min-height: 80px; resize: vertical; line-height: 1.5; }
   padding-bottom: env(safe-area-inset-bottom, 0px);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+@media (min-width: 760px) {
+  .tab-bar {
+    bottom: 24px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: var(--shadow-md);
+  }
+  .tab-item {
+    min-height: 48px;
+    flex-direction: row;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 0.8125rem;
+  }
+  .tab-item.active { background: rgba(126, 214, 192, 0.12); }
+  .tab-item svg, .tab-item .icon { width: 18px; height: 18px; }
+}
+
+@media (max-width: 600px) {
+  .page-content { padding-inline: 20px; }
 }
 
 .tab-item {
