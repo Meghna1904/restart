@@ -90,6 +90,7 @@ export default function HomePage() {
   const [dumpSortOpen, setDumpSortOpen] = useState(false)
   const [beforeAiOpen, setBeforeAiOpen] = useState(false)
   const [beforeAi, setBeforeAi] = useState({ understand: '', tried: '', example: '', stuck: '' })
+  const [showMore, setShowMore] = useState(false)
 
   const [capturedItemId, setCapturedItemId] = useState<string | null>(null)
   const todayKey = `restart-today-${user?.id ?? 'guest'}-${todayLocal()}`
@@ -232,7 +233,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="card" style={{ marginBottom: 24, padding: 20, borderColor: 'rgba(126,214,192,.25)', background: 'linear-gradient(145deg, rgba(126,214,192,.1), var(--card))' }}>
+      <section className={`card home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 24, padding: 20, borderColor: 'rgba(126,214,192,.25)', background: 'linear-gradient(145deg, rgba(126,214,192,.1), var(--card))' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <Icon icon="lucide:rotate-ccw" width={18} style={{ color: 'var(--primary)' }} />
           <p style={{ color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Return, don’t restart</p>
@@ -247,7 +248,7 @@ export default function HomePage() {
         {friction && <p style={{ color: 'var(--muted-foreground)', fontSize: '0.76rem', marginTop: 10 }}>Last time, starting felt: {friction}.</p>}
       </section>
 
-      <section className="card" style={{ marginBottom: 24, padding: 20, background: 'linear-gradient(145deg, rgba(245,199,122,.08), var(--card))' }}>
+      <section className={`card home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 24, padding: 20, background: 'linear-gradient(145deg, rgba(245,199,122,.08), var(--card))' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, alignItems: 'start' }}>
           <div>
             <p style={{ color: 'var(--accent)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>The Restart button</p>
@@ -307,7 +308,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ marginBottom: 26 }}>
+      <button className="home-more-toggle" type="button" onClick={() => setShowMore(value => !value)} aria-expanded={showMore}>
+        <span>{showMore ? 'show less' : 'more ways to restart'}</span>
+        <span aria-hidden="true">{showMore ? '↑' : '↓'}</span>
+      </button>
+
+      <section className={`home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 26 }}>
         <div className="section-header" style={{ marginBottom: 10 }}>
           <h2 className="section-title">A note for the version of you who over-plans</h2>
         </div>
@@ -323,7 +329,7 @@ export default function HomePage() {
         {reflection && <p style={{ color: 'var(--muted-foreground)', fontSize: '0.75rem', marginTop: 6 }}>kept in this browser · no score attached</p>}
       </section>
 
-      <section className="card scroll-card" style={{ marginBottom: 24, padding: 22, background: 'linear-gradient(145deg, rgba(245,199,122,.1), var(--card))' }}>
+      <section className={`card scroll-card home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 24, padding: 22, background: 'linear-gradient(145deg, rgba(245,199,122,.1), var(--card))' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start' }}>
           <div>
             <p style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Notice, don’t punish</p>
@@ -364,7 +370,7 @@ export default function HomePage() {
       </section>
 
       {/* Brain Dump Input */}
-      <div className="card" style={{ marginBottom: 24, padding: 24, background: 'linear-gradient(145deg, var(--card), var(--surface-2))' }}>
+      <div className={`card home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 24, padding: 24, background: 'linear-gradient(145deg, var(--card), var(--surface-2))' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
           <div>
             <p style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 5 }}>Quick capture</p>
@@ -411,7 +417,7 @@ export default function HomePage() {
 
       {/* Gentle Nudge */}
       {showNudge && (
-        <div className="card" style={{ marginBottom: 32, background: 'rgba(10, 147, 150, 0.08)', border: '1px solid rgba(10, 147, 150, 0.2)' }}>
+        <div className={`card home-optional ${showMore ? 'is-visible' : ''}`} style={{ marginBottom: 32, background: 'rgba(10, 147, 150, 0.08)', border: '1px solid rgba(10, 147, 150, 0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <span style={{ fontSize: '1.25rem' }}>{NUDGES[nudgeType].emoji}</span>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
