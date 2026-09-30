@@ -5,7 +5,6 @@ import TabBar from './components/TabBar'
 import AuthPage from './pages/auth/AuthPage'
 import HomePage from './pages/home/HomePage'
 import VaultPage from './pages/vault/VaultPage'
-import FocusPage from './pages/focus/FocusPage'
 import MePage from './pages/me/MePage'
 
 // Protected route wrapper
@@ -44,7 +43,6 @@ export default function App() {
       <Route path="/auth" element={session ? <Navigate to="/home" replace /> : <AuthPage />} />
       
       <Route path="/home" element={<Protected><AppShell><HomePage /></AppShell></Protected>} />
-      <Route path="/focus" element={<Protected><AppShell><FocusPage /></AppShell></Protected>} />
       <Route path="/vault" element={<Protected><AppShell><VaultPage /></AppShell></Protected>} />
       <Route path="/me" element={<Protected><AppShell><MePage /></AppShell></Protected>} />
       
